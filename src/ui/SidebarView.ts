@@ -37,7 +37,12 @@ function card(parent: HTMLElement, title: string, icon = ""): HTMLElement {
 }
 
 function cover(plugin: BookMindPlugin, parent: HTMLElement, b: Book, cls = "bm-cover"): void {
-  const src = /^https?:\/\//i.test(b.cover) ? b.cover : (() => { const f = plugin.app.vault.getAbstractFileByPath(b.cover); return f instanceof TFile ? plugin.app.vault.getResourcePath(f) : ""; })();
+  const src = /^https?:\/\//i.test(b.cover) ? b.cover : (() => {
+    // Accept a plain vault path or a wikilink/embed such as "![[covers/x.png|200]]".
+    const link = b.cover.replace(/^!?\[\[|\]\]$/g, "").split("|")[0].trim();
+    const f = plugin.app.metadataCache.getFirstLinkpathDest(link, b.path) ?? plugin.app.vault.getAbstractFileByPath(link);
+    return f instanceof TFile ? plugin.app.vault.getResourcePath(f) : "";
+  })();
   if (src) { parent.createEl("img", { cls, attr: { src, alt: "", loading: "lazy" } }); return; }
   let h = 0;
   for (const c of b.name) h = (h * 31 + c.codePointAt(0)!) % 360;
