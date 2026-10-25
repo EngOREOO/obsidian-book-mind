@@ -9,7 +9,7 @@ import { insertUnderHeading, appendToSection, SESSIONS_HEAD, toDeckLines } from 
 import { review as srsReview } from "./core/srs";
 import { stalledBooks } from "./core/insights";
 import { formatDuration } from "./core/velocity";
-import { todayKey, fmt1 } from "./core/dates";
+import { addDays, todayKey, fmt1 } from "./core/dates";
 import { BookMindView, renderBlock, VIEW_TYPE } from "./ui/SidebarView";
 import { BookSuggestModal, FetchModal, FlashcardModal, LinkModal, MoodModal, NudgeModal, QuoteCardModal, StopSessionModal } from "./ui/Modals";
 import { BookMindSettingTab } from "./ui/SettingsTab";
@@ -229,7 +229,7 @@ export default class BookMindPlugin extends Plugin {
     const finishedNow = book.pages > 0 && endPage >= book.pages && book.state !== "finished";
     const rj = this.rj.get();
     if (rj && typeof rj.logProgress === "function") await rj.logProgress(book.path, { page: endPage, hours, session: true, notes });
-    else await this.standaloneLog(book, endPage, hours, notes);
+    else await this.standaloneLog(book, endPage, hours, notes, true);
 
     const pages = Math.max(0, endPage - from);
     const time = formatDuration(hours, { h: t("unitH"), m: t("unitM") });
@@ -246,7 +246,7 @@ export default class BookMindPlugin extends Plugin {
   }
 
   /** Same frontmatter writes as Reading Journey's logProgress, for vaults without it. */
-  private async standaloneLog(book: Book, page: number, hours: number, notes: string): Promise<void> {
+  private async standaloneLog(book: Book, page: number, hours: number, notes: string, session: boolean): Promise<void> {
     const f = this.fileOf(book.path);
     const today = todayKey();
     if (f) await this.app.fileManager.processFrontMatter(f, (fm: Record<string, unknown>) => {
@@ -259,7 +259,7 @@ export default class BookMindPlugin extends Plugin {
         if (fm.status !== "finished" && fm.status !== "reading") fm.status = "reading";
         if (!fm.started) fm.started = today;
       }
-      if (p > cur || hours > 0) {
+      if (session && (p > cur || hours > 0)) {
         if (!Array.isArray(fm.sessions)) fm.sessions = [];
         (fm.sessions as unknown[]).push({ id: "s-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7), date: today, fromPage: cur, toPage: p, pages: Math.max(0, p - cur), hours, notes });
       }
@@ -272,7 +272,7 @@ export default class BookMindPlugin extends Plugin {
     const finishedNow = book.pages > 0 && page >= book.pages && book.state !== "finished";
     const rj = this.rj.get();
     if (rj && typeof rj.logProgress === "function") await rj.logProgress(book.path, { page });
-    else await this.standaloneLog(book, page, 0, "");
+    else await this.standaloneLog(book, page, 0, "", false);
     this.refresh();
     if (finishedNow) new MoodModal(this, book).open();
   }
@@ -290,8 +290,7 @@ export default class BookMindPlugin extends Plugin {
   }
 
   async snooze(path: string): Promise<void> {
-    const d = new Date(); d.setDate(d.getDate() + 7);
-    this.data.snoozed[path] = d.toISOString().slice(0, 10);
+    this.data.snoozed[path] = addDays(todayKey(), 7);
     await this.save();
     new Notice(t("snoozed"));
     this.refresh();

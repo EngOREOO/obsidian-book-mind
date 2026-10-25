@@ -50,7 +50,7 @@ export class ReadingJourneyBridge {
   yearGoal(fallback: number): number {
     const rj = this.get();
     const g = rj ? Number(rj.settings.yearGoal) : NaN;
-    return rj && isFinite(g) && g > 0 ? g : fallback;
+    return rj && isFinite(g) && g >= 0 ? g : fallback; // 0 = goal turned off in Reading Journey
   }
 
   hours(date: string, standalone: Record<string, number>): number {
