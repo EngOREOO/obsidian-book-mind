@@ -1,0 +1,10 @@
+{
+  "id": "book-mind",
+  "name": "Book Mind & Reading Companion",
+  "version": "1.0.0",
+  "minAppVersion": "1.5.0",
+  "description": "Reading companion: live reading sessions, speed & finish ETA, spaced-repetition highlight review, series tracker, concept linker, mood & impact, quote cards, flashcards and wrap-ups. Works on top of Reading Journey.",
+  "author": "Ahmed Hany",
+  "authorUrl": "https://github.com/EngOREOO",
+  "isDesktopOnly": false
+}
