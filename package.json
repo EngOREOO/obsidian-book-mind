@@ -1,0 +1,26 @@
+{
+  "name": "obsidian-book-mind",
+  "version": "1.0.0",
+  "description": "Book Mind & Reading Companion for Obsidian: live reading sessions, reading speed & finish ETA, spaced-repetition highlight review, series tracker, concept auto-linker, mood & impact, quote cards, flashcards and reading wrap-ups. Works on top of Reading Journey. English/Arabic (RTL).",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "test": "node tests/run.mjs",
+    "release": "npm run build && node scripts/package.mjs"
+  },
+  "repository": { "type": "git", "url": "git+https://github.com/EngOREOO/obsidian-book-mind.git" },
+  "homepage": "https://github.com/EngOREOO/obsidian-book-mind#readme",
+  "bugs": { "url": "https://github.com/EngOREOO/obsidian-book-mind/issues" },
+  "keywords": ["obsidian", "obsidian-plugin", "reading", "books", "book-tracker", "spaced-repetition", "highlights", "openlibrary", "reading-tracker", "arabic", "rtl"],
+  "author": "Ahmed Hany",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "esbuild": "0.25.12",
+    "obsidian": "1.8.7",
+    "tslib": "2.8.1",
+    "typescript": "5.7.3"
+  }
+}
